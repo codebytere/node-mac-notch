@@ -1,0 +1,57 @@
+{
+  "name": "node-mac-notch",
+  "version": "1.0.0",
+  "description": "A native Node.js module to fetch informationa about the new camera notch at the top of some MacBooks.",
+  "main": "index.js",
+  "scripts": {
+    "build": "node-gyp rebuild",
+    "clean": "node-gyp clean",
+    "lint": "prettier --check index.js",
+    "format": "clang-format -i notch.mm && prettier --write index.js",
+    "test": "./node_modules/.bin/mocha --reporter spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codebytere/node-mac-notch.git"
+  },
+  "keywords": [
+    "Node.js",
+    "Electron",
+    "macOS",
+    "module",
+    "notch",
+    "JavaScript"
+  ],
+  "author": "Shelley Vohr <shelley.vohr@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/codebytere/node-mac-notch/issues"
+  },
+  "homepage": "https://github.com/codebytere/node-mac-notch#readme",
+  "dependencies": {
+    "bindings": "^1.5.0",
+    "node-addon-api": "^4.2.0"
+  },
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "clang-format": "^1.5.0",
+    "husky": "^7.0.4",
+    "lint-staged": "^11.2.3",
+    "mocha": "^9.1.3",
+    "node-gyp": "^8.3.0",
+    "prettier": "^2.4.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write"
+    ],
+    "*.mm": [
+      "clang-format -i"
+    ]
+  }
+}
