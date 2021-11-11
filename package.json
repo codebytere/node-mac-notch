@@ -1,7 +1,7 @@
 {
   "name": "node-mac-notch",
   "version": "1.0.0",
-  "description": "A native Node.js module to fetch informationa about the new camera notch at the top of some MacBooks.",
+  "description": "A native Node.js module to fetch information about the new camera notch at the top of some MacBooks.",
   "main": "index.js",
   "scripts": {
     "build": "node-gyp rebuild",
