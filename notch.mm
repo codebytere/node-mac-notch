@@ -20,13 +20,97 @@ Napi::Object GetObjectForNSRect(Napi::Env env, NSRect rect) {
   return area;
 }
 
+// Returns the NSScreen correspondent to a specified display id.
+NSScreen *ScreenForID(uint32_t display_id) {
+  NSArray<NSScreen *> *screens = [NSScreen screens];
+
+  size_t num_displays = [screens count];
+  for (size_t i = 0; i < num_displays; i++) {
+    NSScreen *screen = [screens objectAtIndex:i];
+    CGDirectDisplayID s_id = [[[screen deviceDescription]
+        objectForKey:@"NSScreenNumber"] unsignedIntValue];
+    if (s_id == display_id)
+      return screen;
+  }
+
+  return nullptr;
+}
+
+// Creates an object containing all properties of an display.
+Napi::Object BuildDisplay(Napi::Env env, NSScreen *nsscreen) {
+  Napi::Object display = Napi::Object::New(env);
+
+  CGDirectDisplayID display_id = [[[nsscreen deviceDescription]
+      objectForKey:@"NSScreenNumber"] unsignedIntValue];
+  display.Set("id", display_id);
+
+  if (@available(macOS 10.15, *)) {
+    display.Set("name", std::string([[nsscreen localizedName] UTF8String]));
+  }
+
+  CGDisplayModeRef display_mode = CGDisplayCopyDisplayMode(display_id);
+  display.Set("refreshRate", CGDisplayModeGetRefreshRate(display_mode));
+
+  display.Set("supportedWindowDepths",
+              CArrayToNapiArray(env, [nsscreen supportedWindowDepths]));
+  display.Set("isAsleep", CGDisplayIsAsleep(display_id) ? true : false);
+  display.Set("isMonochrome", GetIsMonochrome());
+  display.Set("colorSpace", NSColorSpaceToObject(env, [nsscreen colorSpace]));
+  display.Set("depth", static_cast<int>([nsscreen depth]));
+  display.Set("scaleFactor", [nsscreen backingScaleFactor]);
+  display.Set("bounds", NSRectToBoundsObject(env, [nsscreen frame]));
+  display.Set("workArea", NSRectToBoundsObject(env, [nsscreen visibleFrame]));
+  display.Set("rotation", static_cast<int>(CGDisplayRotation(display_id)));
+  display.Set("internal", CGDisplayIsBuiltin(display_id) ? true : false);
+
+  return display;
+}
+
 /***** EXPORTED FUNCTIONS *****/
 
+// Returns an array of all system displays.
+Napi::Array GetAllDisplays(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+  NSArray<NSScreen *> *nsscreens = [NSScreen screens];
+  size_t num_displays = [nsscreens count];
+
+  Napi::Array displays = Napi::Array::New(env, num_displays);
+  for (size_t i = 0; i < num_displays; i++) {
+    displays[i] = BuildDisplay(env, [nsscreens objectAtIndex:i]);
+  }
+
+  return displays;
+}
+
+// Returns the display object with the specified display id.
+Napi::Object GetDisplayByID(const Napi::CallbackInfo &info) {
+  uint32_t display_id = info[0].As<Napi::Number>().Uint32Value();
+
+  NSScreen screen* = GetDisplayFromID(display_id);
+  if (!screen) {
+    std::string msg = "Invalid screen ID - no screen with ID " + screen_id;
+    Napi::Error::New(info.Env(), msg).ThrowAsJavaScriptException();
+    return Napi::Object::New(info.Env());
+  }
+
+  return BuildDisplay(screen);
+}
+
+// Returns the safe area insets for a given NSScreen.
 Napi::Object SafeAreaInsets(const Napi::CallbackInfo &info) {
   Napi::Object insets = Napi::Object::New(info.Env());
 
+  int screen_id = info[0].As<Napi::Number>().Uint32Value();
+
   if (@available(macOS 12.0, *)) {
-    NSEdgeInsets safe_area_insets = [[NSScreen mainScreen] safeAreaInsets];
+    NSScreen *screen = ScreenForID(screen_id);
+    if (!screen) {
+      std::string msg = "Invalid screen ID - no screen with ID " + screen_id;
+      Napi::Error::New(info.Env(), msg).ThrowAsJavaScriptException();
+      return Napi::Object::New(info.Env());
+    }
+
+    NSEdgeInsets safe_area_insets = [screen safeAreaInsets];
     insets.Set("bottom", safe_area_insets.bottom);
     insets.Set("left", safe_area_insets.left);
     insets.Set("right", safe_area_insets.right);
@@ -37,7 +121,15 @@ Napi::Object SafeAreaInsets(const Napi::CallbackInfo &info) {
 }
 
 Napi::Object AuxiliaryTopLeftArea(const Napi::CallbackInfo &info) {
-  NSScreen *screen = [NSScreen mainScreen];
+  int screen_id = info[0].As<Napi::Number>().Uint32Value();
+
+  NSScreen *screen = ScreenForID(screen_id);
+  if (!screen) {
+    std::string msg = "Invalid screen ID - no screen with ID " + screen_id;
+    Napi::Error::New(info.Env(), msg).ThrowAsJavaScriptException();
+    return Napi::Object::New(info.Env());
+  }
+
   if (@available(macOS 12.0, *)) {
     NSRect rect = [screen auxiliaryTopLeftArea];
     return GetObjectForNSRect(info.Env(), rect);
@@ -47,7 +139,15 @@ Napi::Object AuxiliaryTopLeftArea(const Napi::CallbackInfo &info) {
 }
 
 Napi::Object AuxiliaryTopRightArea(const Napi::CallbackInfo &info) {
-  NSScreen *screen = [NSScreen mainScreen];
+  int screen_id = info[0].As<Napi::Number>().Uint32Value();
+
+  NSScreen *screen = ScreenForID(screen_id);
+  if (!screen) {
+    std::string msg = "Invalid screen ID - no screen with ID " + screen_id;
+    Napi::Error::New(info.Env(), msg).ThrowAsJavaScriptException();
+    return Napi::Object::New(info.Env());
+  }
+
   if (@available(macOS 12.0, *)) {
     NSRect rect = [screen auxiliaryTopRightArea];
     return GetObjectForNSRect(info.Env(), rect);
@@ -58,6 +158,10 @@ Napi::Object AuxiliaryTopRightArea(const Napi::CallbackInfo &info) {
 
 // Initializes all functions exposed to JS.
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
+  exports.Set(Napi::String::New(env, "getAllDisplays"),
+              Napi::Function::New(env, GetAllDisplays));
+  exports.Set(Napi::String::New(env, "getDisplayByID"),
+              Napi::Function::New(env, GetDisplayByID));
   exports.Set(Napi::String::New(env, "safeAreaInsets"),
               Napi::Function::New(env, SafeAreaInsets));
   exports.Set(Napi::String::New(env, "auxiliaryTopLeftArea"),
