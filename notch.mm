@@ -4,6 +4,28 @@
 
 /***** HELPERS *****/
 
+// Converts a simple C array to a Napi::Array.
+template <typename T> Napi::Array CArrayToNapiArray(Napi::Env env, T *c_arr) {
+  Napi::Array arr = Napi::Array::New(env, sizeof c_arr);
+
+  for (size_t i = 0; i < sizeof c_arr; i++) {
+    arr[i] = static_cast<int>(c_arr[i]);
+  }
+
+  return arr;
+}
+
+// Converts an NSColorSpace to an object containing information about the
+// colorSpace.
+Napi::Object NSColorSpaceToObject(Napi::Env env, NSColorSpace *color_space) {
+  Napi::Object obj = Napi::Object::New(env);
+
+  obj.Set("name", std::string([[color_space localizedName] UTF8String]));
+  obj.Set("componentCount", [color_space numberOfColorComponents]);
+
+  return obj;
+}
+
 Napi::Object GetObjectForNSRect(Napi::Env env, NSRect rect) {
   Napi::Object area = Napi::Object::New(env);
 
@@ -18,6 +40,21 @@ Napi::Object GetObjectForNSRect(Napi::Env env, NSRect rect) {
   area.Set("size", size);
 
   return area;
+}
+
+// Converts an NSRect to an object representing bounds.
+Napi::Object NSRectToBoundsObject(Napi::Env env, const NSRect &rect) {
+  Napi::Object obj = Napi::Object::New(env);
+
+  CGFloat primary_display_height =
+      NSMaxY([[[NSScreen screens] firstObject] frame]);
+
+  obj.Set("x", rect.origin.x);
+  obj.Set("y", primary_display_height - rect.origin.y - rect.size.height);
+  obj.Set("width", rect.size.width);
+  obj.Set("height", rect.size.height);
+
+  return obj;
 }
 
 // Returns the NSScreen correspondent to a specified display id.
@@ -86,7 +123,7 @@ Napi::Array GetAllDisplays(const Napi::CallbackInfo &info) {
 Napi::Object GetDisplayByID(const Napi::CallbackInfo &info) {
   uint32_t display_id = info[0].As<Napi::Number>().Uint32Value();
 
-  NSScreen screen* = GetDisplayFromID(display_id);
+  NSScreen *screen = GetDisplayFromID(display_id);
   if (!screen) {
     std::string msg = "Invalid screen ID - no screen with ID " + screen_id;
     Napi::Error::New(info.Env(), msg).ThrowAsJavaScriptException();
@@ -167,7 +204,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(Napi::String::New(env, "auxiliaryTopLeftArea"),
               Napi::Function::New(env, AuxiliaryTopLeftArea));
   exports.Set(Napi::String::New(env, "auxiliaryTopRightArea"),
-            Napi::Function::New(env, AuxiliaryTopRightArea));
+              Napi::Function::New(env, AuxiliaryTopRightArea));
 
   return exports;
 }
