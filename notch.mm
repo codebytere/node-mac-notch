@@ -172,7 +172,7 @@ Napi::Object AuxiliaryTopLeftArea(const Napi::CallbackInfo &info) {
     return GetObjectForNSRect(info.Env(), rect);
   }
 
-  return GetObjectForNSRect(info.Env(), [screen visibleFrame]);
+  return GetObjectForNSRect(info.Env(), NSZeroRect);
 }
 
 Napi::Object AuxiliaryTopRightArea(const Napi::CallbackInfo &info) {
@@ -190,7 +190,7 @@ Napi::Object AuxiliaryTopRightArea(const Napi::CallbackInfo &info) {
     return GetObjectForNSRect(info.Env(), rect);
   }
 
-  return GetObjectForNSRect(info.Env(), [screen visibleFrame]);
+  return GetObjectForNSRect(info.Env(), NSZeroRect);
 }
 
 // Initializes all functions exposed to JS.
