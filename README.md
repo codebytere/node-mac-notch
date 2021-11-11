@@ -144,3 +144,81 @@ console.log(insets)
 ```
 
 See [Apple Documentation](https://developer.apple.com/documentation/appkit/nsscreen/3882821-safeareainsets?language=objc) for more information.
+
+### `notch.auxiliaryTopLeftArea([displayID])`
+
+* `displayID` Number (optional) - the unique identifier corresponding to a specific display. If no `displayID` is passed, this function will choose the main display your computer has in focus.
+
+Returns `Object` - An object representing the unobscured portion of the top-left corner of the screen.
+
+  * `size` Object - An object that specifies the height and width of the rectangle.
+    * `width` Number - The width of the safe display area.
+    * `height` Number - The height of the safe display area.
+  * `origin` Object - A point that specifies the coordinates of the rectangle’s origin.
+    * `x` Number - The x-coordinate of the point, from the bottom left of the display.
+    * `y` Number - The y-coordinate of the point,  from the bottom left of the display.
+
+If this is a notched display, the return value for this method represents the visible top-left portion of the screen. If this is not a notched display, the `width` and `height` properties of `size` will be 0.
+
+Example:
+
+```js
+const notch = require('node-mac-notch')
+
+const area = notch.auxiliaryTopLeftArea()
+
+console.log(area)
+/* Prints:
+{
+  size: {
+    width: 1234
+    height: 4321
+  },
+  origin: {
+    x: 0,
+    y: 0,
+  }
+}
+*/
+```
+
+See [Apple Documentation](https://developer.apple.com/documentation/appkit/nsscreen/3882915-auxiliarytopleftarea) for more information.
+
+### `notch.auxiliaryTopRightArea([displayID])`
+
+* `displayID` Number (optional) - the unique identifier corresponding to a specific display. If no `displayID` is passed, this function will choose the main display your computer has in focus.
+
+Returns `Object` - An object representing the unobscured portion of the top-right corner of the screen.
+
+  * `size` Object - An object that specifies the height and width of the rectangle.
+    * `width` Number - The width of the safe display area.
+    * `height` Number - The height of the safe display area.
+  * `origin` Object - A point that specifies the coordinates of the rectangle’s origin.
+    * `x` Number - The x-coordinate of the point, from the bottom left of the display.
+    * `y` Number - The y-coordinate of the point,  from the bottom left of the display.
+
+If this is a notched display, the return value for this method represents the visible top-right portion of the screen. If this is not a notched display, the `width` and `height` properties of `size` will be 0.
+
+Example:
+
+```js
+const notch = require('node-mac-notch')
+
+const area = notch.auxiliaryTopLeftArea()
+
+console.log(area)
+/* Prints:
+{
+  size: {
+    width: 1234
+    height: 4321
+  },
+  origin: {
+    x: 0,
+    y: 0,
+  }
+}
+*/
+```
+
+See [Apple Documentation](https://developer.apple.com/documentation/appkit/nsscreen/3882915-auxiliarytoprightarea) for more information.
