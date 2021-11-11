@@ -135,10 +135,10 @@ const insets = notch.safeAreaInsets()
 console.log(insets)
 /* Prints:
 {
-  bottom: TODO,
-  left: TODO,
-  top: TODO,
-  right: TODO
+  bottom: 0,
+  left: 0,
+  right: 0,
+  top: 38
 }
 */
 ```
@@ -170,13 +170,13 @@ const area = notch.auxiliaryTopLeftArea()
 console.log(area)
 /* Prints:
 {
-  size: {
-    width: 1234
-    height: 4321
-  },
   origin: {
     x: 0,
-    y: 0,
+    y: 1131
+  },
+  size: { 
+    width: 790,
+    height: 38
   }
 }
 */
@@ -204,18 +204,18 @@ Example:
 ```js
 const notch = require('node-mac-notch')
 
-const area = notch.auxiliaryTopLeftArea()
+const area = notch.auxiliaryTopRightArea()
 
 console.log(area)
 /* Prints:
 {
+  origin: { 
+    x: 1010,
+    y: 1131
+  }, 
   size: {
-    width: 1234
-    height: 4321
-  },
-  origin: {
-    x: 0,
-    y: 0,
+    width: 790,
+    height: 38
   }
 }
 */
