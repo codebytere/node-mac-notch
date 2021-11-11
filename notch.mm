@@ -125,7 +125,8 @@ Napi::Object GetDisplayByID(const Napi::CallbackInfo &info) {
 
   NSScreen *screen = GetDisplayFromID(display_id);
   if (!screen) {
-    std::string msg = "Invalid screen ID - no screen with ID " + screen_id;
+    std::string msg =
+        "Invalid screen ID - no screen with ID " + std::to_string(screen_id);
     Napi::Error::New(info.Env(), msg).ThrowAsJavaScriptException();
     return Napi::Object::New(info.Env());
   }
@@ -142,7 +143,8 @@ Napi::Object SafeAreaInsets(const Napi::CallbackInfo &info) {
   if (@available(macOS 12.0, *)) {
     NSScreen *screen = ScreenForID(screen_id);
     if (!screen) {
-      std::string msg = "Invalid screen ID - no screen with ID " + screen_id;
+      std::string msg =
+          "Invalid screen ID - no screen with ID " + std::to_string(screen_id);
       Napi::Error::New(info.Env(), msg).ThrowAsJavaScriptException();
       return Napi::Object::New(info.Env());
     }
@@ -162,7 +164,8 @@ Napi::Object AuxiliaryTopLeftArea(const Napi::CallbackInfo &info) {
 
   NSScreen *screen = ScreenForID(screen_id);
   if (!screen) {
-    std::string msg = "Invalid screen ID - no screen with ID " + screen_id;
+    std::string msg =
+        "Invalid screen ID - no screen with ID " + std::to_string(screen_id);
     Napi::Error::New(info.Env(), msg).ThrowAsJavaScriptException();
     return Napi::Object::New(info.Env());
   }
@@ -180,7 +183,8 @@ Napi::Object AuxiliaryTopRightArea(const Napi::CallbackInfo &info) {
 
   NSScreen *screen = ScreenForID(screen_id);
   if (!screen) {
-    std::string msg = "Invalid screen ID - no screen with ID " + screen_id;
+    std::string msg =
+        "Invalid screen ID - no screen with ID " + std::to_string(screen_id);
     Napi::Error::New(info.Env(), msg).ThrowAsJavaScriptException();
     return Napi::Object::New(info.Env());
   }
