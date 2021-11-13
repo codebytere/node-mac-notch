@@ -15,8 +15,7 @@ template <typename T> Napi::Array CArrayToNapiArray(Napi::Env env, T *c_arr) {
   return arr;
 }
 
-// Converts an NSColorSpace to an object containing information about the
-// colorSpace.
+// Converts an NSColorSpace to an object.
 Napi::Object NSColorSpaceToObject(Napi::Env env, NSColorSpace *color_space) {
   Napi::Object obj = Napi::Object::New(env);
 
@@ -35,31 +34,11 @@ bool GetIsMonochrome() {
   return CFPreferencesGetAppBooleanValue(key, app, &key_valid) ? true : false;
 }
 
-Napi::Object GetObjectForNSRect(Napi::Env env, NSRect rect) {
-  Napi::Object area = Napi::Object::New(env);
-
-  Napi::Object origin = Napi::Object::New(env);
-  origin.Set("x", rect.origin.x);
-  origin.Set("y", rect.origin.y);
-  area.Set("origin", origin);
-
-  Napi::Object size = Napi::Object::New(env);
-  size.Set("width", rect.size.width);
-  size.Set("height", rect.size.height);
-  area.Set("size", size);
-
-  return area;
-}
-
-// Converts an NSRect to an object representing bounds.
 Napi::Object NSRectToBoundsObject(Napi::Env env, const NSRect &rect) {
   Napi::Object obj = Napi::Object::New(env);
 
-  CGFloat primary_display_height =
-      NSMaxY([[[NSScreen screens] firstObject] frame]);
-
   obj.Set("x", rect.origin.x);
-  obj.Set("y", primary_display_height - rect.origin.y - rect.size.height);
+  obj.Set("y", rect.origin.y);
   obj.Set("width", rect.size.width);
   obj.Set("height", rect.size.height);
 
@@ -155,7 +134,7 @@ Napi::Object SafeAreaInsets(const Napi::CallbackInfo &info) {
       std::string msg =
           "Invalid screen ID - no screen with ID " + std::to_string(display_id);
       Napi::Error::New(info.Env(), msg).ThrowAsJavaScriptException();
-      return Napi::Object::New(info.Env());
+      return insets;
     }
 
     NSEdgeInsets safe_area_insets = [screen safeAreaInsets];
@@ -181,10 +160,10 @@ Napi::Object AuxiliaryTopLeftArea(const Napi::CallbackInfo &info) {
 
   if (@available(macOS 12.0, *)) {
     NSRect rect = [screen auxiliaryTopLeftArea];
-    return GetObjectForNSRect(info.Env(), rect);
+    return NSRectToBoundsObject(info.Env(), rect);
   }
 
-  return GetObjectForNSRect(info.Env(), NSZeroRect);
+  return NSRectToBoundsObject(info.Env(), NSZeroRect);
 }
 
 Napi::Object AuxiliaryTopRightArea(const Napi::CallbackInfo &info) {
@@ -200,10 +179,10 @@ Napi::Object AuxiliaryTopRightArea(const Napi::CallbackInfo &info) {
 
   if (@available(macOS 12.0, *)) {
     NSRect rect = [screen auxiliaryTopRightArea];
-    return GetObjectForNSRect(info.Env(), rect);
+    return NSRectToBoundsObject(info.Env(), rect);
   }
 
-  return GetObjectForNSRect(info.Env(), NSZeroRect);
+  return NSRectToBoundsObject(info.Env(), NSZeroRect);
 }
 
 // Initializes all functions exposed to JS.

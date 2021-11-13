@@ -38,7 +38,7 @@ Display objects take the following format:
 
 ### `notch.getAllDisplays()`
 
-Returns `Array<Object>` - An array of display objects.
+Returns `Array<Display>` - An array of display objects.
 
 Example:
 
@@ -78,7 +78,7 @@ See [Apple Documentation](https://developer.apple.com/documentation/appkit/nsscr
 
 * `displayID` Number - The display's unique identifier.
 
-Returns `Object` - the display with the specified `displayID`.
+Returns `Display` - the display with the specified `displayID`.
 
 Example:
 
@@ -117,7 +117,6 @@ See [Apple Documentation](https://developer.apple.com/documentation/appkit/nsscr
 * `displayID` Number (optional) - the unique identifier corresponding to a specific display. If no `displayID` is passed, this function will choose the main display your computer has in focus.
 
 Returns `Object` - an object containing the distances from the display's edges at which content isn’t obscured.
-
   * `bottom` - The distance from the bottom of the source rectangle to the bottom of the result rectangle.
   * `left` - The distance from the left side of the source rectangle to the left side of the result rectangle.
   * `right` - The distance from the right side of the source rectangle to the right side of the result rectangle.
@@ -150,13 +149,10 @@ See [Apple Documentation](https://developer.apple.com/documentation/appkit/nsscr
 * `displayID` Number (optional) - the unique identifier corresponding to a specific display. If no `displayID` is passed, this function will choose the main display your computer has in focus.
 
 Returns `Object` - An object representing the unobscured portion of the top-left corner of the screen.
-
-  * `size` Object - An object that specifies the height and width of the rectangle.
-    * `width` Number - The width of the safe display area.
-    * `height` Number - The height of the safe display area.
-  * `origin` Object - A point that specifies the coordinates of the rectangle’s origin.
-    * `x` Number - The x-coordinate of the point, from the bottom left of the display.
-    * `y` Number - The y-coordinate of the point,  from the bottom left of the display.
+  * `x` Number - The x-coordinate of the point, from the bottom left of the display.
+  * `y` Number - The y-coordinate of the point,  from the bottom left of the display.
+  * `width` Number - The width of the safe display area.
+  * `height` Number - The height of the safe display area.
 
 If this is a notched display, the return value for this method represents the visible top-left portion of the screen. If this is not a notched display, the `width` and `height` properties of `size` will be 0.
 
@@ -170,14 +166,10 @@ const area = notch.auxiliaryTopLeftArea()
 console.log(area)
 /* Prints:
 {
-  origin: {
-    x: 0,
-    y: 1131
-  },
-  size: { 
-    width: 790,
-    height: 38
-  }
+  x: 0,
+  y: 1131,
+  width: 790,
+  height: 38
 }
 */
 ```
@@ -189,13 +181,10 @@ See [Apple Documentation](https://developer.apple.com/documentation/appkit/nsscr
 * `displayID` Number (optional) - the unique identifier corresponding to a specific display. If no `displayID` is passed, this function will choose the main display your computer has in focus.
 
 Returns `Object` - An object representing the unobscured portion of the top-right corner of the screen.
-
-  * `size` Object - An object that specifies the height and width of the rectangle.
-    * `width` Number - The width of the safe display area.
-    * `height` Number - The height of the safe display area.
-  * `origin` Object - A point that specifies the coordinates of the rectangle’s origin.
-    * `x` Number - The x-coordinate of the point, from the bottom left of the display.
-    * `y` Number - The y-coordinate of the point,  from the bottom left of the display.
+  * `x` Number - The x-coordinate of the point, from the bottom left of the display.
+  * `y` Number - The y-coordinate of the point,  from the bottom left of the display.
+  * `width` Number - The width of the safe display area.
+  * `height` Number - The height of the safe display area.
 
 If this is a notched display, the return value for this method represents the visible top-right portion of the screen. If this is not a notched display, the `width` and `height` properties of `size` will be 0.
 
@@ -209,14 +198,10 @@ const area = notch.auxiliaryTopRightArea()
 console.log(area)
 /* Prints:
 {
-  origin: { 
-    x: 1010,
-    y: 1131
-  }, 
-  size: {
-    width: 790,
-    height: 38
-  }
+  x: 1010,
+  y: 1131,
+  width: 790,
+  height: 38
 }
 */
 ```
