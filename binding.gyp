@@ -18,7 +18,8 @@
     ],
     'defines': [ 'NAPI_DISABLE_CPP_EXCEPTIONS' ],
     "xcode_settings": {
-      "MACOSX_DEPLOYMENT_TARGET": "10.17",
+      "MACOSX_DEPLOYMENT_TARGET": "10.16",
+      "SYSTEM_VERSION_COMPAT": 1,
       "OTHER_CPLUSPLUSFLAGS": ["-std=c++14", "-stdlib=libc++"],
       "OTHER_LDFLAGS": ["-framework CoreFoundation -framework AppKit"]
     }
